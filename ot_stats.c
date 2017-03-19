@@ -672,6 +672,26 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
       if( proto == FLAG_TCP ) ot_overall_tcp_successfulannounces++; else ot_overall_udp_successfulannounces++;
       break;
     case EVENT_CONNECT:
+#ifdef WANT_SYSLOGS
+      if( event_data) {
+        struct ot_workstruct *ws = (struct ot_workstruct *)event_data;
+        char timestring[64];
+        char ip_readable[64];
+        struct tm time_now;
+        time_t ttt;
+
+        time( &ttt );
+        localtime_r( &ttt, &time_now );
+        strftime( timestring, sizeof( timestring ), "%FT%T%z", &time_now );
+
+#ifdef WANT_V6
+        ip_readable[ fmt_ip6c( ip_readable, (char*)&ws->peer ) ] = 0;
+#else
+        ip_readable[ fmt_ip4( ip_readable, (char*)&ws->peer ) ] = 0;
+#endif
+        syslog( LOG_INFO, "time=%s event=connect ip=%s", timestring, ip_readable );
+      }
+#endif
       if( proto == FLAG_TCP ) ot_overall_tcp_connects++; else ot_overall_udp_connects++;
       break;
     case EVENT_COMPLETED:

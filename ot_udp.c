@@ -119,7 +119,7 @@ int handle_udp6( int64 serversocket, struct ot_workstruct *ws ) {
       outpacket[3] = connid[1];
 
       socket_send6( serversocket, ws->outbuf, 16, remoteip, remoteport, 0 );
-      stats_issue_event( EVENT_CONNECT, FLAG_UDP, 16 );
+      stats_issue_event( EVENT_CONNECT, FLAG_UDP, (uintptr_t)ws );
       break;
     case 1: /* This is an announce action */
       /* Minimum udp announce packet size */
