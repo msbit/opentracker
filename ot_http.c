@@ -109,7 +109,7 @@ ssize_t http_issue_error( const int64 sock, struct ot_workstruct *ws, int code )
 #ifdef _DEBUG_HTTPERROR
   fprintf( stderr, "DEBUG: invalid request was: %s\n", ws->debugbuf );
 #endif
-  stats_issue_event( EVENT_FAILED, FLAG_TCP, code );
+  stats_issue_event( EVENT_FAILED, FLAG_TCP, ws, code );
   http_senddata( sock, ws );
   return ws->reply_size = -2;
 }
@@ -290,10 +290,10 @@ static ssize_t http_handle_fullscrape( const int64 sock, struct ot_workstruct *w
   if( strstr( ws->request, "gzip" ) ) {
     cookie->flag |= STRUCT_HTTP_FLAG_GZIP;
     format = TASK_FLAG_GZIP;
-    stats_issue_event( EVENT_FULLSCRAPE_REQUEST_GZIP, 0, (uintptr_t)cookie->ip );
+    stats_issue_event( EVENT_FULLSCRAPE_REQUEST_GZIP, 0, ws, (uintptr_t)cookie->ip );
   } else
 #endif
-    stats_issue_event( EVENT_FULLSCRAPE_REQUEST, 0, (uintptr_t)cookie->ip );
+    stats_issue_event( EVENT_FULLSCRAPE_REQUEST, 0, ws, (uintptr_t)cookie->ip );
 
 #ifdef _DEBUG_HTTPERROR
   fprintf( stderr, "%s", ws->debugbuf );
@@ -344,7 +344,7 @@ static ssize_t http_handle_scrape( const int64 sock, struct ot_workstruct *ws, c
 
   /* Enough for http header + whole scrape string */
   ws->reply_size = return_tcp_scrape_for_torrent( multiscrape_buf, numwant, ws->reply );
-  stats_issue_event( EVENT_SCRAPE, FLAG_TCP, (uintptr_t)ws );
+  stats_issue_event( EVENT_SCRAPE, FLAG_TCP, ws, ws->reply_size );
   return ws->reply_size;
 }
 
@@ -513,7 +513,7 @@ static ssize_t http_handle_announce( const int64 sock, struct ot_workstruct *ws,
 #endif
 
   /* XXX DEBUG
-  stats_issue_event( EVENT_ACCEPT, FLAG_TCP, (uintptr_t)ws->reply );
+  stats_issue_event( EVENT_ACCEPT, FLAG_TCP, ws, (uintptr_t)ws->reply );
   */
 
   /* Scanned whole query string */
@@ -525,7 +525,7 @@ static ssize_t http_handle_announce( const int64 sock, struct ot_workstruct *ws,
   else
     ws->reply_size = add_peer_to_torrent_and_return_peers( FLAG_TCP, ws, numwant );
 
-  stats_issue_event( EVENT_ANNOUNCE, FLAG_TCP, (uintptr_t)ws );
+  stats_issue_event( EVENT_ANNOUNCE, FLAG_TCP, ws, ws->reply_size );
   return ws->reply_size;
 }
 

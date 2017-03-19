@@ -137,16 +137,16 @@ size_t add_peer_to_torrent_and_return_peers( PROTO_FLAG proto, struct ot_workstr
     torrent->peer_list->peer_count++;
     if( OT_PEERFLAG(&ws->peer) & PEER_FLAG_COMPLETED ) {
       torrent->peer_list->down_count++;
-      stats_issue_event( EVENT_COMPLETED, 0, (uintptr_t)ws );
+      stats_issue_event( EVENT_COMPLETED, 0, ws, 0 );
     }
     if( OT_PEERFLAG(&ws->peer) & PEER_FLAG_SEEDING )
       torrent->peer_list->seed_count++;
 
   } else {
-    stats_issue_event( EVENT_RENEW, 0, OT_PEERTIME( peer_dest ) );
+    stats_issue_event( EVENT_RENEW, 0, ws, OT_PEERTIME( peer_dest ) );
 #ifdef WANT_SPOT_WOODPECKER
     if( ( OT_PEERTIME(peer_dest) > 0 ) && ( OT_PEERTIME(peer_dest) < 20 ) )
-      stats_issue_event( EVENT_WOODPECKER, 0, (uintptr_t)&ws->peer );
+      stats_issue_event( EVENT_WOODPECKER, 0, ws, (uintptr_t)&ws->peer );
 #endif
 #ifdef WANT_SYNC_LIVE
     /* Won't live sync peers that come back too fast. Only exception:
@@ -164,7 +164,7 @@ size_t add_peer_to_torrent_and_return_peers( PROTO_FLAG proto, struct ot_workstr
       torrent->peer_list->seed_count++;
     if( !(OT_PEERFLAG(peer_dest) & PEER_FLAG_COMPLETED ) &&  (OT_PEERFLAG(&ws->peer) & PEER_FLAG_COMPLETED ) ) {
       torrent->peer_list->down_count++;
-      stats_issue_event( EVENT_COMPLETED, 0, (uintptr_t)ws );
+      stats_issue_event( EVENT_COMPLETED, 0, ws, 0 );
     }
     if(   OT_PEERFLAG(peer_dest) & PEER_FLAG_COMPLETED )
       OT_PEERFLAG( &ws->peer ) |= PEER_FLAG_COMPLETED;

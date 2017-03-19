@@ -230,7 +230,7 @@ static void handle_accept( const int64 serversocket ) {
     io_setcookie( sock, cookie );
     io_wantread( sock );
 
-    stats_issue_event( EVENT_ACCEPT, FLAG_TCP, (uintptr_t)ip);
+    stats_issue_event( EVENT_ACCEPT, FLAG_TCP, 0, (uintptr_t)ip);
 
     /* That breaks taia encapsulation. But there is no way to take system
        time this often in FreeBSD and libowfat does not allow to set unix time */

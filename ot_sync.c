@@ -141,7 +141,7 @@ static void * sync_worker( void * args) {
     ot_tasktype tasktype = TASK_SYNC_OUT;
     ot_taskid   taskid   = mutex_workqueue_poptask( &tasktype );
     sync_make( &iovec_entries, &iovector );
-    stats_issue_event( EVENT_SYNC_OUT, FLAG_TCP, iovec_length( &iovec_entries, &iovector) );
+    stats_issue_event( EVENT_SYNC_OUT, FLAG_TCP, 0, iovec_length( &iovec_entries, &iovector) );
     if( mutex_workqueue_pushresult( taskid, iovec_entries, iovector ) )
       iovec_free( &iovec_entries, &iovector );
   }

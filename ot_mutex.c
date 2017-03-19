@@ -49,7 +49,7 @@ static int bucket_check( int bucket ) {
   /* See, if bucket is already locked */
   for( i=0; i<bucket_locklist_count; ++i )
     if( bucket_locklist[ i ] == bucket ) {
-      stats_issue_event( EVENT_BUCKET_LOCKED, 0, 0 );
+      stats_issue_event( EVENT_BUCKET_LOCKED, 0, 0, 0 );
       return -1;
     }
 

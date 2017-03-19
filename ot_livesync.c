@@ -141,7 +141,7 @@ static void livesync_handle_peersync( struct ot_workstruct *ws ) {
     off += sizeof( ot_hash ) + sizeof( ot_peer );
   }
 
-  stats_issue_event(EVENT_SYNC, 0,
+  stats_issue_event(EVENT_SYNC, 0, ws,
                     (ws->request_size - sizeof( g_tracker_id ) - sizeof( uint32_t ) ) /
                     ((ssize_t)sizeof( ot_hash ) + (ssize_t)sizeof( ot_peer )));
 }

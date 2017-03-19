@@ -633,7 +633,7 @@ static void stats_make( int *iovec_entries, struct iovec **iovector, ot_tasktype
   iovec_fixlast( iovec_entries, iovector, r );
 }
 
-void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event_data ) {
+void stats_issue_event( ot_status_event event, PROTO_FLAG proto, struct ot_workstruct *ws, uintptr_t event_data ) {
   switch( event ) {
     case EVENT_ACCEPT:
       if( proto == FLAG_TCP ) ot_overall_tcp_connections++; else ot_overall_udp_connections++;
@@ -643,8 +643,7 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
       break;
     case EVENT_ANNOUNCE:
 #ifdef WANT_SYSLOGS
-      if( event_data) {
-        struct ot_workstruct *ws = (struct ot_workstruct *)event_data;
+      {
         char timestring[64];
         char hash_hex[42], ip_readable[64];
         struct tm time_now;
@@ -668,8 +667,7 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
       break;
     case EVENT_CONNECT:
 #ifdef WANT_SYSLOGS
-      if( event_data) {
-        struct ot_workstruct *ws = (struct ot_workstruct *)event_data;
+      {
         char timestring[64];
         char ip_readable[64];
         struct tm time_now;
@@ -691,8 +689,7 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
       break;
     case EVENT_COMPLETED:
 #ifdef WANT_SYSLOGS
-      if( event_data) {
-        struct ot_workstruct *ws = (struct ot_workstruct *)event_data;
+      {
         char timestring[64];
         char hash_hex[42], ip_readable[64];
         struct tm time_now;
@@ -716,10 +713,9 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
       break;
     case EVENT_SCRAPE:
 #ifdef WANT_SYSLOGS
-      if( event_data) {
-        struct ot_workstruct *ws = (struct ot_workstruct *)event_data;
+      {
         char timestring[64];
-        char hash_hex[42], ip_readable[64];
+        char ip_readable[64];
         struct tm time_now;
         time_t ttt;
 
@@ -727,14 +723,12 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
         localtime_r( &ttt, &time_now );
         strftime( timestring, sizeof( timestring ), "%FT%T%z", &time_now );
 
-        to_hex( hash_hex, *ws->hash );
-
 #ifdef WANT_V6
         ip_readable[ fmt_ip6c( ip_readable, (char*)&ws->peer ) ] = 0;
 #else
         ip_readable[ fmt_ip4( ip_readable, (char*)&ws->peer ) ] = 0;
 #endif
-        syslog( LOG_INFO, "time=%s event=scrape info_hash=%s ip=%s", timestring, hash_hex, ip_readable );
+        syslog( LOG_INFO, "time=%s event=scrape ip=%s", timestring, ip_readable );
       }
 #endif
       if( proto == FLAG_TCP ) ot_overall_tcp_successfulscrapes++; else ot_overall_udp_successfulscrapes++;

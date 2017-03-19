@@ -70,8 +70,8 @@ int handle_udp6( int64 serversocket, struct ot_workstruct *ws ) {
   byte_count = socket_recv6( serversocket, ws->inbuf, G_INBUF_SIZE, remoteip, &remoteport, &scopeid );
   if( !byte_count ) return 0;
 
-  stats_issue_event( EVENT_ACCEPT, FLAG_UDP, (uintptr_t)remoteip );
-  stats_issue_event( EVENT_READ, FLAG_UDP, byte_count );
+  stats_issue_event( EVENT_ACCEPT, FLAG_UDP, ws, (uintptr_t)remoteip );
+  stats_issue_event( EVENT_READ, FLAG_UDP, ws, byte_count );
 
   /* Minimum udp tracker packet size, also catches error */
   if( byte_count < 16 )
@@ -102,7 +102,7 @@ int handle_udp6( int64 serversocket, struct ot_workstruct *ws ) {
       outpacket[0] = htonl( 3 ); outpacket[1] = inpacket[3];
       memcpy( &outpacket[2], "Connection ID missmatch.", s );
       socket_send6( serversocket, ws->outbuf, 8 + s, remoteip, remoteport, 0 );
-      stats_issue_event( EVENT_CONNID_MISSMATCH, FLAG_UDP, 8 + s );
+      stats_issue_event( EVENT_CONNID_MISSMATCH, FLAG_UDP, ws, 8 + s );
       return 1;
     }
   }
@@ -119,7 +119,7 @@ int handle_udp6( int64 serversocket, struct ot_workstruct *ws ) {
       outpacket[3] = connid[1];
 
       socket_send6( serversocket, ws->outbuf, 16, remoteip, remoteport, 0 );
-      stats_issue_event( EVENT_CONNECT, FLAG_UDP, (uintptr_t)ws );
+      stats_issue_event( EVENT_CONNECT, FLAG_UDP, ws, 16 );
       break;
     case 1: /* This is an announce action */
       /* Minimum udp announce packet size */
@@ -166,7 +166,7 @@ int handle_udp6( int64 serversocket, struct ot_workstruct *ws ) {
       }
 
       socket_send6( serversocket, ws->outbuf, ws->reply_size, remoteip, remoteport, 0 );
-      stats_issue_event( EVENT_ANNOUNCE, FLAG_UDP, (uintptr_t)ws );
+      stats_issue_event( EVENT_ANNOUNCE, FLAG_UDP, ws, ws->reply_size );
       break;
 
     case 2: /* This is a scrape action */
@@ -177,7 +177,7 @@ int handle_udp6( int64 serversocket, struct ot_workstruct *ws ) {
         return_udp_scrape_for_torrent( *(ot_hash*)( ((char*)inpacket) + 16 + 20 * scrape_count ), ((char*)outpacket) + 8 + 12 * scrape_count );
 
       socket_send6( serversocket, ws->outbuf, 8 + 12 * scrape_count, remoteip, remoteport, 0 );
-      stats_issue_event( EVENT_SCRAPE, FLAG_UDP, (uintptr_t)ws );
+      stats_issue_event( EVENT_SCRAPE, FLAG_UDP, ws, scrape_count );
       break;
   }
   return 1;
