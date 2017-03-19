@@ -344,7 +344,7 @@ static ssize_t http_handle_scrape( const int64 sock, struct ot_workstruct *ws, c
 
   /* Enough for http header + whole scrape string */
   ws->reply_size = return_tcp_scrape_for_torrent( multiscrape_buf, numwant, ws->reply );
-  stats_issue_event( EVENT_SCRAPE, FLAG_TCP, ws->reply_size );
+  stats_issue_event( EVENT_SCRAPE, FLAG_TCP, (uintptr_t)ws );
   return ws->reply_size;
 }
 
@@ -524,7 +524,7 @@ static ssize_t http_handle_announce( const int64 sock, struct ot_workstruct *ws,
   else
     ws->reply_size = add_peer_to_torrent_and_return_peers( FLAG_TCP, ws, numwant );
 
-  stats_issue_event( EVENT_ANNOUNCE, FLAG_TCP, ws->reply_size);
+  stats_issue_event( EVENT_ANNOUNCE, FLAG_TCP, (uintptr_t)ws );
   return ws->reply_size;
 }
 
