@@ -403,8 +403,8 @@ static ssize_t http_handle_announce( const int64 sock, struct ot_workstruct *ws,
 #endif
   OT_SETIP( &ws->peer, cookie->ip );
 
-  ws->peer_id = NULL;
   ws->hash = NULL;
+  ws->peer_id[0] = '\0';
 
   OT_SETPORT( &ws->peer, &port );
   OT_PEERFLAG( &ws->peer ) = 0;
@@ -502,7 +502,8 @@ static ssize_t http_handle_announce( const int64 sock, struct ot_workstruct *ws,
       case 9: /* matched "peer_id" */
         /* ignore this, when we have less than 20 bytes */
         if( scan_urlencoded_query( &read_ptr, write_ptr = read_ptr, SCAN_SEARCHPATH_VALUE ) != 20 ) HTTPERROR_400_PARAM;
-        ws->peer_id = write_ptr;
+        memcpy( ws->peer_id, write_ptr, 20 );
+        ws->peer_id[20] = '\0';
         break;
     }
   }

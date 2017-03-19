@@ -122,7 +122,7 @@ struct ot_workstruct {
 
   /* Pointers into the request buffer */
   ot_hash *hash;
-  char    *peer_id;
+  char     peer_id[21];
 
   /* HTTP specific, non static */
   int      keep_alive;

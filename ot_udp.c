@@ -88,7 +88,7 @@ int handle_udp6( int64 serversocket, struct ot_workstruct *ws ) {
 
   /* Initialise hash pointer */
   ws->hash = NULL;
-  ws->peer_id = NULL;
+  ws->peer_id[0] = '\0';
 
   /* If action is not 0 (connect), then we expect the derived
      connection id in first 64 bit */
@@ -125,6 +125,10 @@ int handle_udp6( int64 serversocket, struct ot_workstruct *ws ) {
       /* Minimum udp announce packet size */
       if( byte_count < 98 )
         return 1;
+
+      /* Copy peer_id from inpacket */
+      memcpy( ws->peer_id, &(inpacket[9]), 20 );
+      ws->peer_id[20] = '\0';
 
       /* We do only want to know, if it is zero */
       left  = inpacket[64/4] | inpacket[68/4];
