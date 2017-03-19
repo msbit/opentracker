@@ -492,7 +492,7 @@ static void stats_return_fulllog( int *iovec_entries, struct iovec **iovector, c
   char * re = r + OT_STATS_TMPSIZE;
 
   g_logchain_first = g_logchain_last = 0;
-  
+
   while( loglist ) {
     if( r + ( loglist->size + 64 ) >= re ) {
       r = iovec_fix_increase_or_free( iovec_entries, iovector, r, 32 * OT_STATS_TMPSIZE );
@@ -642,6 +642,33 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
 #endif
       break;
     case EVENT_ANNOUNCE:
+#ifdef WANT_SYSLOGS
+      if( event_data) {
+        struct ot_workstruct *ws = (struct ot_workstruct *)event_data;
+        char timestring[64];
+        char hash_hex[42], peerid_hex[42], ip_readable[64];
+        struct tm time_now;
+        time_t ttt;
+
+        time( &ttt );
+        localtime_r( &ttt, &time_now );
+        strftime( timestring, sizeof( timestring ), "%FT%T%z", &time_now );
+
+        to_hex( hash_hex, *ws->hash );
+        if( ws->peer_id )
+          to_hex( peerid_hex, (uint8_t*)ws->peer_id );
+        else {
+          *peerid_hex=0;
+        }
+
+#ifdef WANT_V6
+        ip_readable[ fmt_ip6c( ip_readable, (char*)&ws->peer ) ] = 0;
+#else
+        ip_readable[ fmt_ip4( ip_readable, (char*)&ws->peer ) ] = 0;
+#endif
+        syslog( LOG_INFO, "time=%s event=announce info_hash=%s peer_id=%s ip=%s", timestring, hash_hex, peerid_hex, ip_readable );
+      }
+#endif
       if( proto == FLAG_TCP ) ot_overall_tcp_successfulannounces++; else ot_overall_udp_successfulannounces++;
       break;
     case EVENT_CONNECT:
@@ -678,6 +705,33 @@ void stats_issue_event( ot_status_event event, PROTO_FLAG proto, uintptr_t event
       ot_overall_completed++;
       break;
     case EVENT_SCRAPE:
+#ifdef WANT_SYSLOGS
+      if( event_data) {
+        struct ot_workstruct *ws = (struct ot_workstruct *)event_data;
+        char timestring[64];
+        char hash_hex[42], peerid_hex[42], ip_readable[64];
+        struct tm time_now;
+        time_t ttt;
+
+        time( &ttt );
+        localtime_r( &ttt, &time_now );
+        strftime( timestring, sizeof( timestring ), "%FT%T%z", &time_now );
+
+        to_hex( hash_hex, *ws->hash );
+        if( ws->peer_id )
+          to_hex( peerid_hex, (uint8_t*)ws->peer_id );
+        else {
+          *peerid_hex=0;
+        }
+
+#ifdef WANT_V6
+        ip_readable[ fmt_ip6c( ip_readable, (char*)&ws->peer ) ] = 0;
+#else
+        ip_readable[ fmt_ip4( ip_readable, (char*)&ws->peer ) ] = 0;
+#endif
+        syslog( LOG_INFO, "time=%s event=scrape info_hash=%s peer_id=%s ip=%s", timestring, hash_hex, peerid_hex, ip_readable );
+      }
+#endif
       if( proto == FLAG_TCP ) ot_overall_tcp_successfulscrapes++; else ot_overall_udp_successfulscrapes++;
       break;
     case EVENT_FULLSCRAPE:
