@@ -28,3 +28,7 @@ scan_urlencoded_query.debug.o
 scan_urlencoded_query.o
 trackerlogic.debug.o
 trackerlogic.o
+
+.DS_Store
+opentracker.xcodeproj/project.xcworkspace/
+opentracker.xcodeproj/xcuserdata/
